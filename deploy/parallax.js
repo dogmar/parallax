@@ -99,6 +99,7 @@
     this.calibrationFlag = true;
     this.enabled = false;
     this.depths = [];
+    this.props = [];
     this.raf = null;
 
     // Element Bounds
@@ -264,6 +265,7 @@
     // Cache Layer Elements
     this.layers = this.element.getElementsByClassName('layer');
     this.depths = [];
+    this.props = [];
 
     // Configure Layer Styles
     for (var i = 0, l = this.layers.length; i < l; i++) {
@@ -276,6 +278,7 @@
 
       // Cache Layer Depth
       this.depths.push(this.data(layer, 'depth') || 0);
+      this.props.push({lockx: this.data(layer, 'lockx') || false, locky: this.data(layer, 'locky') || false});
     }
   };
 
@@ -452,8 +455,12 @@
     for (var i = 0, l = this.layers.length; i < l; i++) {
       var layer = this.layers[i];
       var depth = this.depths[i];
-      var xOffset = this.vx * depth * (this.invertX ? -1 : 1);
-      var yOffset = this.vy * depth * (this.invertY ? -1 : 1);
+      var props = this.props[i];
+      if (!props.lockx) {
+        var xOffset = this.vx * depth * (this.invertX ? -1 : 1);
+      } else if (!props.locky) {
+        var yOffset = this.vy * depth * (this.invertY ? -1 : 1);
+      }
       this.setPosition(layer, xOffset, yOffset);
     }
     this.raf = requestAnimationFrame(this.onAnimationFrame);
